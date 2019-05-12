@@ -351,6 +351,15 @@ class Logging():
         """
         if not self.bot.server_settings[before.guild.id]['logging_enabled']:
             return
+        user_mutuals = []
+        for guild in self.bot.guilds:
+            if before in guild.members:
+                user_mutuals.append(guild.id)
+        extended_channels = []
+        for guild_id in user_mutuals:
+            extended_channels.extend(
+                await self.bot.pg_utils.get_logger_channels(
+                    guild_id))
         channels = await self.bot.pg_utils.get_logger_channels(
                 before.guild.id)
         if before.roles != after.roles:
@@ -375,7 +384,7 @@ class Logging():
         if before.name != after.name:
             local_embed = embeds.UsernameUpdateEmbed(
                 after, before.name, after.name)
-            for channel in channels:
+            for channel in extended_channels:
                 ch = self.bot.get_channel(channel)
                 await ch.send(embed=local_embed)
 

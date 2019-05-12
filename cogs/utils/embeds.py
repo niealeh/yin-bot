@@ -3,8 +3,12 @@ This class will contain all the embeds used for at the very least
 the mod log
 """
 
+# flake8: noqa
+
 import discord
 import datetime
+
+from .enums import Action
 
 NEGATIVECOLOR = 0x651111
 SLIGHTLYNEGATIVECOLOR = 0xF26E00
@@ -44,10 +48,40 @@ class InternalErrorEmbed(discord.Embed):
         )
         self.set_footer(text=return_current_time())
 
+class CommandErrorEmbed(discord.Embed):
+    """
+    Embed for when it isn't the users fault
+    """
+    def __init__(self, message):
+        local_title = f'Error Executing Command!'
+        local_desc = message
+        super().__init__(
+            color=NEGATIVECOLOR,
+            title=local_title,
+            description=local_desc
+        )
+        self.set_footer(text=return_current_time())
+
+
+class LogbanErrorEmbed(discord.Embed):
+    """
+    Embed for when it is the users fault
+    """
+    def __init__(self):
+        local_title = f'Incorrect User!'
+        local_desc = f'The user that was passed in '\
+                     f'hasn\'t been banned or does not exist!'
+        super().__init__(
+            color=NEGATIVECOLOR,
+            title=local_title,
+            description=local_desc
+        )
+        self.set_footer(text=return_current_time())
+
 
 class InviteEmbed(discord.Embed):
     """
-    Embed that contains link to invite
+    Embed that contains link to invite yin elsewhere
     """
     def __init__(self):
         local_title = f'Invite link'
@@ -62,7 +96,7 @@ class InviteEmbed(discord.Embed):
 
 class SupportEmbed(discord.Embed):
     """
-    Embed that contains link to invite
+    Embed that contains link to yin's support server
     """
     def __init__(self):
         local_title = f'Invite link'
@@ -100,7 +134,7 @@ class KickEmbed(discord.Embed):
         """
         Init class for embed
         """
-        local_title = f'{kicked_user.name} was kicked by {resp_mod}'
+        local_title = f'{kicked_user.name} was kicked by {resp_mod.name}'
         local_desc = f'Reason: {reason}'
         super().__init__(
             color=SLIGHTLYNEGATIVECOLOR,
@@ -119,7 +153,7 @@ class BanEmbed(discord.Embed):
         """
         Init class for embed
         """
-        local_title = f'{banned_user.name} was banned by {resp_mod}'
+        local_title = f'{banned_user.name} was banned by {resp_mod.name}'
         local_desc = f'Reason: {reason}'
         super().__init__(
             color=NEGATIVECOLOR,
@@ -138,7 +172,7 @@ class ModerationEmbed(discord.Embed):
         """
         Init class for embed
         """
-        local_title = f'{moderated_user.name} was moderated by {resp_mod}'
+        local_title = f'{moderated_user.name} was moderated by {resp_mod.name}'
         local_desc = f'Reason: {reason}'
         super().__init__(
             color=SLIGHTLYNEGATIVECOLOR,
@@ -150,7 +184,7 @@ class ModerationEmbed(discord.Embed):
 
 class LogBanEmbed(discord.Embed):
     """
-    Embed for when a user joins the server
+    Embed for when a moderator logs a ban that has already occurred
     """
     def __init__(self, leaving_user: discord.Member):
         """
@@ -169,14 +203,14 @@ class LogBanEmbed(discord.Embed):
 
 class UnBanEmbed(discord.Embed):
     """
-    Embed for when a user has been kicked
+    Embed for when a user has their ban revoked
     """
     def __init__(self, unbanned_user: discord.Member,
                  resp_mod: discord.Member, reason: str):
         """
         Init class for embed
         """
-        local_title = f'{unbanned_user.name} was unbanned by {resp_mod}'
+        local_title = f'{unbanned_user.name} was unbanned by {resp_mod.name}'
         local_desc = f'Reason: {reason}'
         super().__init__(
             color=POSITIVECOLOR,
@@ -208,7 +242,7 @@ class JoinEmbed(discord.Embed):
 
 class LeaveEmbed(discord.Embed):
     """
-    Embed for when a user joins the server
+    Embed for when a user leaves the server
     """
     def __init__(self, leaving_user: discord.Member):
         """
@@ -228,7 +262,7 @@ class LeaveEmbed(discord.Embed):
 
 class UsernameUpdateEmbed(discord.Embed):
     """
-    Embed for when a user edits their profile
+    Embed for when a user changes their username
     """
     def __init__(self, updated_user: discord.Member,
                  old_name: str, new_name: str):
@@ -249,7 +283,7 @@ class UsernameUpdateEmbed(discord.Embed):
 
 class RoleAddEmbed(discord.Embed):
     """
-    Embed for when a user's role is updated
+    Embed for when a user has a role added
     """
     def __init__(self, updated_user: discord.Member,
                  role_name: str):
@@ -270,7 +304,7 @@ class RoleAddEmbed(discord.Embed):
 
 class RoleRemoveEmbed(discord.Embed):
     """
-    Embed for when a user's role is updated
+    Embed for when a user has a role removed
     """
     def __init__(self, updated_user: discord.Member,
                  role_name: str):
@@ -291,7 +325,7 @@ class RoleRemoveEmbed(discord.Embed):
 
 class MessageEditEmbed(discord.Embed):
     """
-    Embed for when a user updates their message
+    Embed for when a user edits their message
     """
     def __init__(self, message_user: discord.Member,
                  channel_name, old_message, new_message):
@@ -313,7 +347,7 @@ class MessageEditEmbed(discord.Embed):
 
 class MessageDeleteEmbed(discord.Embed):
     """
-    Embed for when a user updates their message
+    Embed for when a user deletes a message
     """
     def __init__(self, message_user: discord.Member,
                  channel_name, old_message):
@@ -350,7 +384,7 @@ class SelfRoleAddedEmbed(discord.Embed):
 
 class SelfRoleRemovedEmbed(discord.Embed):
     """
-    Embed for when a role is added
+    Embed for when a user removes a self assignable role
     """
     def __init__(self, message_user, role_name):
         local_title = f'Role Removed'
@@ -366,7 +400,7 @@ class SelfRoleRemovedEmbed(discord.Embed):
 
 class SelfRoleNotAssignableEmbed(discord.Embed):
     """
-    Embed for when a role can't be assigned
+    Embed for when a user requests a role that can't be self assigned
     """
     def __init__(self, role_name):
         local_title = f'Role Not Added'
@@ -381,7 +415,7 @@ class SelfRoleNotAssignableEmbed(discord.Embed):
 
 class RoleNotFoundEmbed(discord.Embed):
     """
-    Embed for not found role
+    Embed for when a user requests a role that doesn't exist
     """
     def __init__(self, role_name):
         local_title = f' '
@@ -396,7 +430,7 @@ class RoleNotFoundEmbed(discord.Embed):
 
 class RoleDuplicateUserEmbed(discord.Embed):
     """
-    Embed for already has role
+    Embed for when a user requests a role they already have
     """
     def __init__(self, message_user, role_name):
         local_desc = f'{message_user.mention}, you already have the '\
@@ -411,7 +445,7 @@ class RoleDuplicateUserEmbed(discord.Embed):
 
 class RoleNotRemovedEmbed(discord.Embed):
     """
-    Embed for when people already have no role
+    Embed for when a user requests to remove a role they don't have
     """
     def __init__(self, message_user, role_name):
         local_desc = f'{message_user.mention}, you already don\'t'\
@@ -426,7 +460,7 @@ class RoleNotRemovedEmbed(discord.Embed):
 
 class VoiceChannelStateEmbed(discord.Embed):
     """
-    Embed for voice channel update
+    Embed for user joined/left voice channel update
     """
     def __init__(self, channel_user: discord.Member,
                  channel_name, action):
@@ -446,7 +480,7 @@ class VoiceChannelStateEmbed(discord.Embed):
 
 class VoiceChannelMoveEmbed(discord.Embed):
     """
-    Embed for voice channel update
+    Embed for user moved voice channel update
     """
     def __init__(self, channel_user: discord.Member,
                  before_channel, after_channel):
@@ -463,6 +497,27 @@ class VoiceChannelMoveEmbed(discord.Embed):
             description=local_desc,
             )
         self.set_footer(text=return_current_time())
+
+
+class WarningEditEmbed(discord.Embed):
+    """
+    Embed for when someone gets warned
+    """
+    def __init__(self, warned_user: discord.Member, major: bool,
+                 reason: str, infraction_count: int):
+        level = 'MAJOR' if major else 'MINOR'
+        local_title = f'User Warning Edited'
+        local_desc = f'{warned_user.mention}'\
+                     f' previous warning has been changed to a **{level}** warning for:\n'\
+                     f'\'**{reason}**\''
+        super().__init__(
+            color=SLIGHTLYNEGATIVECOLOR,
+            title=local_title,
+            description=local_desc,
+            )
+        self.set_footer(
+            text=f'This is warning number {infraction_count}'
+                 f' for {warned_user.name}')
 
 
 class WarningAddEmbed(discord.Embed):
@@ -486,11 +541,27 @@ class WarningAddEmbed(discord.Embed):
                  f' for {warned_user.name}')
 
 
+class WarningRmEmbed(discord.Embed):
+    """
+    Embed for when someone gets a warning removed
+    """
+    def __init__(self, warned_user: discord.Member):
+        local_title = f'User Warning Removed'
+        local_desc = f'{warned_user.mention}'\
+                     f' has been forgiven for a warning.'
+        super().__init__(
+            color=SLIGHTLYNEGATIVECOLOR,
+            title=local_title,
+            description=local_desc,
+            )
+
+
 class WarningListEmbed(discord.Embed):
     """
     Embed that lists all a users infractions
     """
-    def __init__(self, warned_user: discord.Member, infractions: list, logger):
+    def __init__(self, warned_user: discord.Member, infractions: list,
+                 logger, count: bool=False):
 
         local_title = f'**{warned_user.name}#{warned_user.discriminator}'\
                       f'**\'s infractions'
@@ -498,9 +569,10 @@ class WarningListEmbed(discord.Embed):
         warning_string = ''
         string_list = []
         for index, warning in enumerate(infractions):
+            index = warning['indexid']
             level = 'MAJOR' if warning['major'] else 'MINOR'
             date = warning['logtime'].strftime('%b %d %Y %H:%M')
-            tmp_warning_string = f'**{index+1}.** ({level})'\
+            tmp_warning_string = f'**{index}.** ({level})'\
                                  f' {warning["reason"]} '\
                                  f'[{date}]\n'
             if len(tmp_warning_string) + len(warning_string) > 1000:
@@ -515,6 +587,9 @@ class WarningListEmbed(discord.Embed):
             )
         if string_list[0] != '':
             for index, string in enumerate(string_list):
+                if count:
+                    string = f'{string}\nThere are more warnings > 6 months ago.'
+                string = f'{string}\n**Join Date:** {warned_user.joined_at.strftime("%b %d %Y %H:%M")}'
                 if index == 0:
                     self.add_field(
                         name='Infractions:',
@@ -526,3 +601,84 @@ class WarningListEmbed(discord.Embed):
                             value=string
                         )
         self.set_footer(text=return_current_time())
+
+
+class ModerationListEmbed(discord.Embed):
+    """
+    Embed that lists all a users ModActions
+    """
+    def __init__(self, moderated_user: discord.Member,
+                 modactions: list, logger, count: bool=False):
+
+        local_title = f'**{moderated_user.name}#{moderated_user.discriminator}'\
+                      f'**\'s modactions'
+        local_desc = f'' if modactions else f'User has no modactions'
+        moderation_string = ''
+        string_list = []
+        for index, moderation in enumerate(modactions):
+            index = moderation['indexid']
+            level = Action(moderation['action']).name
+            date = moderation['logtime'].strftime('%b %d %Y %H:%M')
+            tmp_warning_string = f'**{index}.** ({level})'\
+                                 f' {moderation["reason"]} '\
+                                 f'[{date}]\n'
+            if len(tmp_warning_string) + len(moderation_string) > 1000:
+                string_list.append(moderation_string)
+                moderation_string = tmp_warning_string
+            moderation_string += tmp_warning_string
+        string_list.append(moderation_string)
+        super().__init__(
+            color=SLIGHTLYNEGATIVECOLOR,
+            title=local_title,
+            description=local_desc,
+            )
+        if string_list[0] != '':
+            for index, string in enumerate(string_list):
+                if count:
+                    string = f'{string}\nThere are more mod actions > 6 months ago.'
+                string = f'{string}\n**Join Date:** {moderated_user.joined_at.strftime("%b %d %Y %H:%M")}'
+                if index == 0:
+                    self.add_field(
+                        name='Modactions:',
+                        value=string
+                    )
+                else:
+                    self.add_field(
+                            name='Modactions:(cont)',
+                            value=string
+                        )
+        self.set_footer(text=return_current_time())
+
+class ModEditEmbed(discord.Embed):
+    """
+    Embed for when someone gets moderation action editted
+    """
+    def __init__(self, modded_user: discord.Member, mod_id: discord.Member,
+                 action_type: Action,
+                 reason: str, infraction_count: int):
+        local_title = f'User ModAction Edited by {mod_id.name}'
+        local_desc = f'{modded_user.mention}'\
+                     f' previous modaction has been changed to a **{action_type.name}** action for:\n'\
+                     f'\'**{reason}**\''
+        super().__init__(
+            color=SLIGHTLYNEGATIVECOLOR,
+            title=local_title,
+            description=local_desc,
+            )
+        self.set_footer(
+            text=f'This is infraction number {infraction_count}'
+                 f' for {modded_user.name}')
+
+class ModRmEmbed(discord.Embed):
+    """
+    Embed for when someone gets a modaction removed
+    """
+    def __init__(self, warned_user: discord.Member):
+        local_title = f'User Modaction Removed'
+        local_desc = f'{warned_user.mention}'\
+                     f' has been forgiven for a modaction.'
+        super().__init__(
+            color=SLIGHTLYNEGATIVECOLOR,
+            title=local_title,
+            description=local_desc,
+            )
